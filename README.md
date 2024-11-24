@@ -18,8 +18,8 @@ ansible-galaxy collection install ansible.windows ansible.utils
 ansible -i inventory.yml all -m ping
 ```
 
-## playbookの実行
+## setupの実行
 
 ```bash
-ansible-playbook -i inventory.yml playbook.yml
+ansible-playbook -i inventory.yml setup.yml
 ```
