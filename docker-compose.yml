@@ -1,0 +1,48 @@
+version: "3.8"
+services:
+  server1:
+    build:
+      context: .
+    privileged: true
+    ports:
+      - "2222:22"
+    command: sh -c "service ssh start && sleep infinity"
+    volumes:
+      - ./ssh:/root/.ssh
+    networks:
+      - ansible-network
+    environment:
+      - DEBIAN_FRONTEND=noninteractive
+    tty: true
+  server2:
+    build:
+      context: .
+    privileged: true
+    ports:
+      - "2223:22"
+    command: sh -c "service ssh start && sleep infinity"
+    volumes:
+      - ./ssh:/root/.ssh
+    networks:
+      - ansible-network
+    environment:
+      - DEBIAN_FRONTEND=noninteractive
+    tty: true
+  server3:
+    build:
+      context: .
+    privileged: true
+    ports:
+      - "2224:22"
+    command: sh -c "service ssh start && sleep infinity"
+    volumes:
+      - ./ssh:/root/.ssh
+    networks:
+      - ansible-network
+    environment:
+      - DEBIAN_FRONTEND=noninteractive
+    tty: true
+
+networks:
+  ansible-network:
+    driver: bridge
