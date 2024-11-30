@@ -5,33 +5,27 @@
   become: yes
 
   tasks:
-    - name: Run a command using Bash
-      ansible.builtin.shell: |
-        echo "This command is running in Bash"
-      args:
-        executable: /bin/bash
-
     - name: Set branch_name to main if not provided
       ansible.builtin.set_fact:
         branch_name: "main"
       when: branch_name is not defined
 
-    # - name: Pull
-    #   shell: git pull origin main
-    #   args:
-    #     chdir: "{{ repo_path }}"
-    #     executable: "/bin/bash"
+    - name: Pull
+      shell: git pull origin main
+      args:
+        chdir: "{{ repo_path }}"
+        executable: "/bin/bash"
 
-    # - name: Fetch the latest updates from the remote repository
-    #   ansible.builtin.command:
-    #     cmd: git fetch --all
-    #     chdir: "{{ repo_path }}"
+    - name: Fetch the latest updates from the remote repository
+      ansible.builtin.command:
+        cmd: git fetch --all
+        chdir: "{{ repo_path }}"
 
-    # - name: Switch to the specified branch and reset to the latest remote branch
-    #   ansible.builtin.command:
-    #     cmd: |
-    #       git switch {{ branch_name }} && git reset --hard origin/{{ branch_name }}
-    #     chdir: "{{ repo_path }}"
+    - name: Switch to the specified branch and reset to the latest remote branch
+      ansible.builtin.command:
+        cmd: |
+          git switch {{ branch_name }} && git reset --hard origin/{{ branch_name }}
+        chdir: "{{ repo_path }}"
 
     - name: Manage MySQL service state
       ansible.builtin.systemd:
@@ -55,7 +49,6 @@
 
     - name: Manage App service state
       ansible.builtin.systemd:
-        # name: "{{ app_name }}"
-        name: isuports
+        name: "{{ app_name }}"
         state: "{{ 'restarted' if use_app else 'stopped' }}"
         enabled: "{{ 'yes' if use_app else 'no' }}"
