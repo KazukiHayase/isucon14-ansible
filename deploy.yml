@@ -5,21 +5,27 @@
   become: yes
 
   tasks:
+    - name: Run a command using Bash
+      ansible.builtin.shell: |
+        echo "This command is running in Bash"
+      args:
+        executable: /bin/bash
+
     - name: Set branch_name to main if not provided
       ansible.builtin.set_fact:
         branch_name: "main"
       when: branch_name is not defined
 
-    - name: Fetch the latest updates from the remote repository
-      ansible.builtin.command:
-        cmd: git fetch --all
-        chdir: "{{ repo_path }}"
+    # - name: Fetch the latest updates from the remote repository
+    #   ansible.builtin.command:
+    #     cmd: git fetch --all
+    #     chdir: "{{ repo_path }}"
 
-    - name: Switch to the specified branch and reset to the latest remote branch
-      ansible.builtin.command:
-        cmd: |
-          git switch {{ branch_name }} && git reset --hard origin/{{ branch_name }}
-        chdir: "{{ repo_path }}"
+    # - name: Switch to the specified branch and reset to the latest remote branch
+    #   ansible.builtin.command:
+    #     cmd: |
+    #       git switch {{ branch_name }} && git reset --hard origin/{{ branch_name }}
+    #     chdir: "{{ repo_path }}"
 
     - name: Manage MySQL service state
       ansible.builtin.systemd:
@@ -34,14 +40,16 @@
         enabled: "{{ 'yes' if use_nginx else 'no' }}"
 
     - name: Build Go application if use_app is true
-      ansible.builtin.command:
-        cmd: go build -o {{ app_name }} {{ go_source_file }}
+      shell: /usr/lib/go-1.23/bin/go build -o {{ app_name }} {{ go_source_file }}
+      args:
         chdir: "{{ repo_path }}"
+        executable: "/bin/bash"
       # use_app が true の場合にのみ実行
       when: use_app | bool
 
     - name: Manage App service state
       ansible.builtin.systemd:
-        name: "{{ app_name }}"
+        # name: "{{ app_name }}"
+        name: isuports
         state: "{{ 'restarted' if use_app else 'stopped' }}"
         enabled: "{{ 'yes' if use_app else 'no' }}"
