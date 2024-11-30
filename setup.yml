@@ -1,15 +1,3 @@
-- name: Install curl
-  hosts: all
-  vars_files:
-    - vars.yml
-  tasks:
-    - name: Ping the target
-      ping:
-    - name: Install curl
-      apt:
-        name: curl
-        state: present
-
 - name: Install New Relic
   hosts: all
   roles:
@@ -21,13 +9,11 @@
       - infrastructure
       - logs
       - nginx
-      # TODO: 必要なら設定
-      # - mysql
+      - mysql
   environment:
     NEW_RELIC_API_KEY: "{{ new_relic_api_key }}"
     NEW_RELIC_ACCOUNT_ID: "{{ new_relic_account_id }}"
     NEW_RELIC_REGION: "{{ new_relic_region }}"
-    # TODO: 必要なら設定
-    # NEW_RELIC_MYSQL_ROOT_PASSWORD: root
-    # NEW_RELIC_MYSQL_PASSWORD: isucon
-    # NEW_RELIC_MYSQL_USERNAME: isucon
+    NEW_RELIC_MYSQL_ROOT_PASSWORD: root
+    NEW_RELIC_MYSQL_PASSWORD: newrelic
+    NEW_RELIC_MYSQL_USERNAME: newrelic
