@@ -27,7 +27,7 @@ ansible-playbook -i inventory.yml setup.yml
 ## デプロイ
 
 ```bash
-ansible-playbook -i inventory.yml deploy.yml -e "branch_name=<branch_name>"
+ansible-playbook -i inventory.yml rakko.yml -e "branch_name=<branch_name>"
 ```
 
 systemctl list-unit-files --type=service
