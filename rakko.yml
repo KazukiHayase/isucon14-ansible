@@ -16,11 +16,11 @@
         branch_name: "main"
       when: branch_name is not defined
 
-    - name: Pull
-      shell: git pull origin main
-      args:
-        chdir: "{{ repo_path }}"
-        executable: "/bin/bash"
+    # - name: Pull
+    #   shell: git pull origin main
+    #   args:
+    #     chdir: "{{ repo_path }}"
+    #     executable: "/bin/bash"
 
     # - name: Fetch the latest updates from the remote repository
     #   ansible.builtin.command:
