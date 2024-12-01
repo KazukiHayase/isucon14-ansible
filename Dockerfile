@@ -10,6 +10,7 @@ RUN apt-get update && apt-get install -y openssh-server && \
 RUN echo 'root:rootpassword' | chpasswd
 
 RUN apt-get install -y sudo
+RUN mkdir /root/working_dir
 
 # コンテナ内でSSHをデフォルトで起動する
 CMD ["/usr/sbin/sshd", "-D"]
