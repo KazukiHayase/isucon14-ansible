@@ -2,18 +2,11 @@ all:
   vars:
     ansible_host: localhost
     ansible_user: root
-    ansible_ssh_private_key_file: ./.ssh_local/ansible_local_key
-    ansible_port: 2222
+    ansible_ssh_private_key_file: ./ssh/ansible_local_key
   hosts:
-    server1:
-      use_mysql: true
-      use_nginx: true
-      use_app: true
-    server2:
-      use_mysql: true
-      use_nginx: true
-      use_app: true
-    server3:
-      use_mysql: true
-      use_nginx: true
-      use_app: true
+    host1:
+      ansible_port: 2222
+    host2:
+      ansible_port: 2223
+    host3:
+      ansible_port: 2224
