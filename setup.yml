@@ -1,19 +1,85 @@
-- name: Install New Relic
+# - name: Install New Relic
+#   hosts: all
+#   roles:
+#     - role: newrelic.newrelic_install
+#   vars_files:
+#     - vars.yml
+#   vars:
+#     targets:
+#       - infrastructure
+#       - logs
+#       - nginx
+#   environment:
+#     NEW_RELIC_API_KEY: "{{ new_relic_api_key }}"
+#     NEW_RELIC_ACCOUNT_ID: "{{ new_relic_account_id }}"
+#     NEW_RELIC_REGION: "{{ new_relic_region }}"
+
+- name: Setup Git
   hosts: all
-  roles:
-    - role: newrelic.newrelic_install
   vars_files:
     - vars.yml
-  vars:
-    targets:
-      - infrastructure
-      - logs
-      - nginx
-      # - mysql
-  environment:
-    NEW_RELIC_API_KEY: "{{ new_relic_api_key }}"
-    NEW_RELIC_ACCOUNT_ID: "{{ new_relic_account_id }}"
-    NEW_RELIC_REGION: "{{ new_relic_region }}"
-    # NEW_RELIC_MYSQL_ROOT_PASSWORD: root
-    # NEW_RELIC_MYSQL_PASSWORD: newrelic
-    # NEW_RELIC_MYSQL_USERNAME: newrelic
+  become: yes
+
+  tasks:
+    - name: Install Git
+      apt:
+        name: git
+        state: present
+
+    # Gitのグローバル設定
+    - name: Configure Git global user name
+      git_config:
+        name: user.name
+        value: "{{ git_user_name }}"
+        scope: global
+
+    - name: Configure Git global user email
+      git_config:
+        name: user.email
+        value: "{{ git_user_email }}"
+        scope: global
+
+    # SSH鍵の配置
+    - name: Create SSH directory
+      file:
+        path: ~/.ssh
+        state: directory
+        mode: '0700'
+
+    - name: Copy SSH private key
+      copy:
+        src: .ssh/id_rsa
+        dest: ~/.ssh/id_rsa
+        mode: '0600'
+
+    - name: Copy SSH public key
+      copy:
+        src: .ssh/id_rsa.pub
+        dest: ~/.ssh/id_rsa.pub
+        mode: '0644'
+
+    - name: Add GitHub to known_hosts
+      shell: ssh-keyscan -H github.com >> ~/.ssh/known_hosts
+      args:
+        creates: ~/.ssh/known_hosts
+
+    # .gitが存在するかチェック
+    - name: Check if the repository is already initialized
+      stat:
+        path: "{{ working_dir }}/.git"
+      register: repo_status
+
+    # リモートリポジトリのセットアップ
+    - name: Setup Git remote repository
+      shell: |
+        git init
+        git remote add origin {{ git_repo_path }}
+        git add .
+        git commit -m "Initial commit"
+        git branch -M main
+        git push -u origin main
+      args:
+        chdir: "{{ working_dir }}"
+      when:
+        - inventory_hostname == "host1"
+        - not repo_status.stat.exists
