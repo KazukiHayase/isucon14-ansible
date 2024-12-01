@@ -133,6 +133,13 @@
 
     - name: Copy and link mysql.conf
       block:
+        # バックアップ用にコピー
+        - name: Copy mysql.conf for backup
+          copy:
+            src: /etc/mysql/mysql.conf
+            dest: /etc/mysql/mysql.conf.bak
+            remote_src: yes
+
         - name: Copy mysql.conf to target directory
           copy:
             src: /etc/mysql/mysql.conf
@@ -147,13 +154,20 @@
             force: yes
       when: not mysql_conf_status.stat.exists
 
+    - name: Check if there are changes in the repository
+      shell: git status --porcelain
+      args:
+        chdir: "{{ working_dir }}"
+      register: git_status_output
     - name: Push changes to remote repository
       shell: |
         git add .
-        git commit -m "add symbolic links"
+        git commit -m "add symbolic links for host1"
+        git branch -M main
         git push origin main
       args:
         chdir: "{{ working_dir }}"
+      when: git_status_output.stdout != ""
 
 - name: Setup Symbolic Links for host2
   hosts: host2
@@ -213,6 +227,13 @@
 
     - name: Copy and link mysql.conf
       block:
+        # バックアップ用にコピー
+        - name: Copy mysql.conf for backup
+          copy:
+            src: /etc/mysql/mysql.conf
+            dest: /etc/mysql/mysql.conf.bak
+            remote_src: yes
+
         - name: Copy mysql.conf to target directory
           copy:
             src: /etc/mysql/mysql.conf
@@ -227,11 +248,111 @@
             force: yes
       when: not mysql_conf_status.stat.exists
 
+    - name: Check if there are changes in the repository
+      shell: git status --porcelain
+      args:
+        chdir: "{{ working_dir }}"
+      register: git_status_output
     - name: Push changes to remote repository
       shell: |
         git add .
-        git commit -m "add symbolic links"
+        git commit -m "add symbolic links for host2"
         git branch -M main
         git push origin main
       args:
         chdir: "{{ working_dir }}"
+      when: git_status_output.stdout != ""
+
+- name: Setup Symbolic Links for host3
+  hosts: host3
+  vars_files:
+    - vars.yml
+  become: yes
+
+  tasks:
+    # .gitが存在するかチェック
+    - name: Check if the repository is already initialized
+      stat:
+        path: "{{ working_dir }}/.git"
+      register: repo_status
+
+    - name: Setup Git remote repository
+      shell: |
+        git init
+        git remote add origin {{ git_repo_path }}
+        git fetch origin main
+        git reset --hard origin/main
+      args:
+        chdir: "{{ working_dir }}"
+      when: not repo_status.stat.exists
+
+    - name: Check if nginx.conf exists
+      stat:
+        path: "{{ working_dir }}/nginx/nginx_3.conf"
+      register: nginx_conf_status
+
+    - name: Copy and link nginx.conf
+      block:
+        # バックアップ用にコピー
+        - name: Copy nginx.conf for backup
+          copy:
+            src: /etc/nginx/nginx.conf
+            dest: /etc/nginx/nginx.conf.bak
+            remote_src: yes
+
+        - name: Copy nginx.conf to target directory
+          copy:
+            src: /etc/nginx/nginx.conf
+            dest: "{{ working_dir }}/nginx/nginx_3.conf"
+            remote_src: yes
+
+        - name: Create symbolic link for nginx.conf
+          file:
+            src: "{{ working_dir }}/nginx/nginx_3.conf"
+            dest: /etc/nginx/nginx.conf
+            state: link
+            force: yes
+      when: not nginx_conf_status.stat.exists
+
+    - name: Check if mysql.conf exists
+      stat:
+        path: "{{ working_dir }}/mysql/mysql_3.conf"
+      register: mysql_conf_status
+
+    - name: Copy and link mysql.conf
+      block:
+        # バックアップ用にコピー
+        - name: Copy mysql.conf for backup
+          copy:
+            src: /etc/mysql/mysql.conf
+            dest: /etc/mysql/mysql.conf.bak
+            remote_src: yes
+
+        - name: Copy mysql.conf to target directory
+          copy:
+            src: /etc/mysql/mysql.conf
+            dest: "{{ working_dir }}/mysql/mysql_3.conf"
+            remote_src: yes
+
+        - name: Create symbolic link for mysql.conf
+          file:
+            src: "{{ working_dir }}/mysql/mysql_3.conf"
+            dest: /etc/mysql/mysql.conf
+            state: link
+            force: yes
+      when: not mysql_conf_status.stat.exists
+
+    - name: Check if there are changes in the repository
+      shell: git status --porcelain
+      args:
+        chdir: "{{ working_dir }}"
+      register: git_status_output
+    - name: Push changes to remote repository
+      shell: |
+        git add .
+        git commit -m "add symbolic links for host3"
+        git branch -M main
+        git push origin main
+      args:
+        chdir: "{{ working_dir }}"
+      when: git_status_output.stdout != ""
