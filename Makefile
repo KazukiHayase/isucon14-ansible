@@ -16,7 +16,7 @@ ping:
 setup:
 	ansible-playbook -i $(ANSIBLE_INVENTORY_FILENAME) $(ANSIBLE_SETUP_FILENAME)
 
-# e.g. make deploy branch_name=main
+# e.g. make deploy branch=main
 .PHONY: deploy
 deploy:
-	ansible-playbook -i $(ANSIBLE_INVENTORY_FILENAME) $(ANSIBLE_DEPLOY_FILENAME) -e "branch_name=$(branch_name)"
+	ansible-playbook -i $(ANSIBLE_INVENTORY_FILENAME) $(ANSIBLE_DEPLOY_FILENAME) -e "branch=$(branch)"

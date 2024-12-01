@@ -7,29 +7,22 @@
 ## セットアップ
 
 ```bash
-brew install ansible
-ansible-galaxy install newrelic.newrelic_install
-ansible-galaxy collection install ansible.windows ansible.utils
+make setup
 ```
-
 ## 疎通確認
 
 ```bash
-ansible -i inventory.yml all -m ping
+make ping
 ```
 
 ## setupの実行
 
 ```bash
-ansible-playbook -i inventory.yml setup.yml
+make setup
 ```
 
 ## デプロイ
 
 ```bash
-ansible-playbook -i inventory.yml rakko.yml -e "branch_name=<branch_name>"
+make deploy branch=main
 ```
-
-systemctl list-unit-files --type=service
-systemctl cat
-systemctl daemon-reload
