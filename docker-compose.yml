@@ -8,7 +8,7 @@ services:
       - "2222:22"
     command: sh -c "service ssh start && sleep infinity"
     volumes:
-      - ./ssh:/root/.ssh
+      - ./.ssh_local:/root/.ssh
     networks:
       - ansible-network
     environment:
@@ -22,7 +22,7 @@ services:
       - "2223:22"
     command: sh -c "service ssh start && sleep infinity"
     volumes:
-      - ./ssh:/root/.ssh
+      - ./.ssh_local:/root/.ssh
     networks:
       - ansible-network
     environment:
@@ -36,7 +36,7 @@ services:
       - "2224:22"
     command: sh -c "service ssh start && sleep infinity"
     volumes:
-      - ./ssh:/root/.ssh
+      - ./.ssh_local:/root/.ssh
     networks:
       - ansible-network
     environment:
