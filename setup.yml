@@ -87,9 +87,7 @@
         git push -u origin main
       args:
         chdir: "{{ working_dir }}"
-      when:
-        - inventory_hostname == "host1"
-        - not repo_status.stat.exists
+      when: not repo_status.stat.exists
 
     - name: Create directories for symbolic links
       file:
@@ -153,6 +151,87 @@
       shell: |
         git add .
         git commit -m "add symbolic links"
+        git push origin main
+      args:
+        chdir: "{{ working_dir }}"
+
+- name: Setup Symbolic Links for host2
+  hosts: host2
+  vars_files:
+    - vars.yml
+  become: yes
+
+  tasks:
+    # .gitが存在するかチェック
+    - name: Check if the repository is already initialized
+      stat:
+        path: "{{ working_dir }}/.git"
+      register: repo_status
+
+    - name: Setup Git remote repository
+      shell: |
+        git init
+        git remote add origin {{ git_repo_path }}
+        git fetch origin main
+        git reset --hard origin/main
+      args:
+        chdir: "{{ working_dir }}"
+      when: not repo_status.stat.exists
+
+    - name: Check if nginx.conf exists
+      stat:
+        path: "{{ working_dir }}/nginx/nginx_2.conf"
+      register: nginx_conf_status
+
+    - name: Copy and link nginx.conf
+      block:
+        # バックアップ用にコピー
+        - name: Copy nginx.conf for backup
+          copy:
+            src: /etc/nginx/nginx.conf
+            dest: /etc/nginx/nginx.conf.bak
+            remote_src: yes
+
+        - name: Copy nginx.conf to target directory
+          copy:
+            src: /etc/nginx/nginx.conf
+            dest: "{{ working_dir }}/nginx/nginx_2.conf"
+            remote_src: yes
+
+        - name: Create symbolic link for nginx.conf
+          file:
+            src: "{{ working_dir }}/nginx/nginx_2.conf"
+            dest: /etc/nginx/nginx.conf
+            state: link
+            force: yes
+      when: not nginx_conf_status.stat.exists
+
+    - name: Check if mysql.conf exists
+      stat:
+        path: "{{ working_dir }}/mysql/mysql_2.conf"
+      register: mysql_conf_status
+
+    - name: Copy and link mysql.conf
+      block:
+        - name: Copy mysql.conf to target directory
+          copy:
+            src: /etc/mysql/mysql.conf
+            dest: "{{ working_dir }}/mysql/mysql_2.conf"
+            remote_src: yes
+
+        - name: Create symbolic link for mysql.conf
+          file:
+            src: "{{ working_dir }}/mysql/mysql_2.conf"
+            dest: /etc/mysql/mysql.conf
+            state: link
+            force: yes
+      when: not mysql_conf_status.stat.exists
+
+    - name: Push changes to remote repository
+      shell: |
+        git add .
+        git commit -m "add symbolic links"
+        git branch -M main
         git push origin main
       args:
         chdir: "{{ working_dir }}"
