@@ -1,18 +1,18 @@
-# - name: Install New Relic
-#   hosts: all
-#   roles:
-#     - role: newrelic.newrelic_install
-#   vars_files:
-#     - vars.yml
-#   vars:
-#     targets:
-#       - infrastructure
-#       - logs
-#       - nginx
-#   environment:
-#     NEW_RELIC_API_KEY: "{{ new_relic_api_key }}"
-#     NEW_RELIC_ACCOUNT_ID: "{{ new_relic_account_id }}"
-#     NEW_RELIC_REGION: "{{ new_relic_region }}"
+- name: Install New Relic
+  hosts: all
+  roles:
+    - role: newrelic.newrelic_install
+  vars_files:
+    - vars.yml
+  vars:
+    targets:
+      - infrastructure
+      - logs
+      - nginx
+  environment:
+    NEW_RELIC_API_KEY: "{{ new_relic_api_key }}"
+    NEW_RELIC_ACCOUNT_ID: "{{ new_relic_account_id }}"
+    NEW_RELIC_REGION: "{{ new_relic_region }}"
 
 - name: Setup Git
   hosts: all
