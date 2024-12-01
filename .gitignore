@@ -1,2 +1,6 @@
 vars.yml
 .ssh
+.ssh_local/*
+!.ssh_local/ansible_local_key
+!.ssh_local/ansible_local_key.pub
+!.ssh_local/authorized_keys
