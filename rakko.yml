@@ -5,27 +5,13 @@
   become: yes
 
   tasks:
-    - name: Set branch_name to main if not provided
-      ansible.builtin.set_fact:
-        branch_name: "main"
-      when: branch_name is not defined
-
-    - name: Pull
-      shell: git pull origin main
+    - name: Switch branch to the specified branch
+      shell: |
+        git fetch origin {{ branch }}
+        git switch {{ branch }}
+        git pull origin {{ branch }}
       args:
-        chdir: "{{ repo_path }}"
-        executable: "/bin/bash"
-
-    - name: Fetch the latest updates from the remote repository
-      ansible.builtin.command:
-        cmd: git fetch --all
-        chdir: "{{ repo_path }}"
-
-    - name: Switch to the specified branch and reset to the latest remote branch
-      ansible.builtin.command:
-        cmd: |
-          git switch {{ branch_name }} && git reset --hard origin/{{ branch_name }}
-        chdir: "{{ repo_path }}"
+        chdir: "{{ working_dir }}"
 
     - name: Manage MySQL service state
       ansible.builtin.systemd:
@@ -40,10 +26,9 @@
         enabled: "{{ 'yes' if use_nginx else 'no' }}"
 
     - name: Build Go application if use_app is true
-      shell: /usr/lib/go-1.23/bin/go build -o {{ app_name }} {{ go_source_file }}
+      shell: go build -o {{ app_name }} {{ go_source_file }}
       args:
-        chdir: "{{ repo_path }}"
-        executable: "/bin/bash"
+        chdir: "{{ working_dir }}"
       # use_app が true の場合にのみ実行
       when: use_app | bool
 
