@@ -356,3 +356,59 @@
       args:
         chdir: "{{ working_dir }}"
       when: git_status_output.stdout != ""
+
+- name: Setup tbls
+  hosts: host1
+  vars_files:
+    - vars.yml
+  become: yes
+
+  tasks:
+    - name: Install required packages
+      package:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - wget
+        - mysql-client
+
+    - name: Download tbls binary
+      get_url:
+        url: "https://github.com/k1LoW/tbls/releases/download/v1.79.4/tbls_v1.79.4_linux_amd64.tar.gz"
+        dest: "/tmp/tbls.tar.gz"
+
+    - name: Extract tbls binary
+      unarchive:
+        src: "/tmp/tbls.tar.gz"
+        dest: "{{ tbls_install_dir }}"
+        remote_src: yes
+
+    - name: Ensure tbls is executable
+      file:
+        path: "{{ tbls_install_dir }}/tbls"
+        mode: "0755"
+
+    - name: Create directories for tbls
+      file:
+        path: "{{ working_dir }}/tbls"
+        state: directory
+        mode: '0755'
+
+    - name: Create tbls config.yml
+      copy:
+        dest: "{{ working_dir }}/tbls/config.yml"
+        content: |
+          dsn: "{{ db_url }}"
+          docPath: "{{ working_dir }}/tbls"
+
+    - name: Generate ER diagram using tbls
+      shell: tbls doc --force
+      args:
+        chdir: "{{ working_dir }}/tbls"
+
+    - name: Push changes to remote repository
+      shell: |
+        git add .
+        git commit -m "add tbls ER diagram"
+        git switch main
+        git push origin main
