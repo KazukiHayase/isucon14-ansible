@@ -17,6 +17,8 @@ setup:
 	ansible-playbook -i $(ANSIBLE_INVENTORY_FILENAME) $(ANSIBLE_SETUP_FILENAME)
 
 # e.g. make deploy branch=main
+# default branch
+branch:=main
 .PHONY: deploy
 deploy:
 	ansible-playbook -i $(ANSIBLE_INVENTORY_FILENAME) $(ANSIBLE_DEPLOY_FILENAME) -e "branch=$(branch)"
