@@ -1,10 +1,10 @@
 all:
   vars:
     ansible_user: isucon
-    ansible_ssh_private_key_file: ./.ssh/isucon.key 
+    ansible_ssh_private_key_file: ./.ssh/isucon_rsa
   hosts:
     host1:
-      ansible_host: 43.207.199.223
+      ansible_host: 52.195.174.166
       use_mysql: true
       use_nginx: true
       use_app: true
