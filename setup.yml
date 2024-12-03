@@ -80,6 +80,7 @@
     - name: Setup Git remote repository
       shell: |
         git init
+        git config --global --add safe.directory {{ working_dir }}
         git remote add origin {{ git_repo_path }}
         git add .
         git commit -m "initial commit"
@@ -136,20 +137,20 @@
         # バックアップ用にコピー
         - name: Copy mysql.conf for backup
           copy:
-            src: /etc/mysql/mysql.conf
+            src: /etc/mysql/mysql.cnf
             dest: /etc/mysql/mysql.conf.bak
             remote_src: yes
 
         - name: Copy mysql.conf to target directory
           copy:
-            src: /etc/mysql/mysql.conf
+            src: /etc/mysql/mysql.cnf
             dest: "{{ working_dir }}/mysql/mysql_1.conf"
             remote_src: yes
 
         - name: Create symbolic link for mysql.conf
           file:
             src: "{{ working_dir }}/mysql/mysql_1.conf"
-            dest: /etc/mysql/mysql.conf
+            dest: /etc/mysql/mysql.cnf
             state: link
             force: yes
       when: not mysql_conf_status.stat.exists
