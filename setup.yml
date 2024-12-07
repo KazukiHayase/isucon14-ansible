@@ -85,7 +85,7 @@
         git add .
         git commit -m "initial commit"
         git branch -M main
-        git push -u origin main
+        git push -f -u origin main
       args:
         chdir: "{{ working_dir }}"
       when: not repo_status.stat.exists
