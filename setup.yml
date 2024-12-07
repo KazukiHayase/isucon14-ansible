@@ -403,7 +403,7 @@
           docPath: "{{ working_dir }}/tbls"
 
     - name: Generate ER diagram using tbls
-      shell: tbls doc --force
+      shell: tbls doc --config config.yml
       args:
         chdir: "{{ working_dir }}/tbls"
 
