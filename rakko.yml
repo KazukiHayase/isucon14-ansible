@@ -26,9 +26,9 @@
         enabled: "{{ 'yes' if use_nginx else 'no' }}"
 
     - name: Build Go application if use_app is true
-      shell: go build -o {{ bin_name }} {{ go_source_file }}
+      shell: /home/isucon/local/golang/bin/go build -o {{ bin_name }}
       args:
-        chdir: "{{ working_dir }}"
+        chdir: "{{ working_dir }}/go"
       # use_app が true の場合にのみ実行
       when: use_app | bool
 
