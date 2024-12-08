@@ -4,10 +4,10 @@ DB_HOST:=127.0.0.1
 DB_PORT:=3306
 DB_USER:=isucon
 DB_PASS:=isucon
-DB_NAME:=TODO
+DB_NAME:=isuride
 MYSQL_CMD:=mysql -h$(DB_HOST) -P$(DB_PORT) -u$(DB_USER) -p$(DB_PASS) $(DB_NAME)
 
-APP_SERVICE_NAME:=TODO
+APP_SERVICE_NAME:=isuride-go
 
 .PHONY: checkout
 checkout:
@@ -31,7 +31,7 @@ sql:
 
 .PHONY: list
 list:
-	echo "hoge" | grep -E 'nginx|mysql|$(APP_SERVICE_NAME)'
+	systemctl list-units --type=service --all | grep -E 'nginx|mysql|$(APP_SERVICE_NAME)'
 
 # e.g. make cat service=nginx
 .PHONY: cat
