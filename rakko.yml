@@ -26,7 +26,6 @@
         enabled: "{{ 'yes' if use_nginx else 'no' }}"
 
     - name: Build Go application if use_app is true
-      # TODO: 必要ならgoのパス変更
       shell: /home/isucon/local/golang/bin/go build -o {{ bin_name }}
       args:
         chdir: "{{ working_dir }}/go"
