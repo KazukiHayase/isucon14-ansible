@@ -4,17 +4,17 @@ all:
     ansible_ssh_private_key_file: ./.ssh/isucon_rsa
   hosts:
     host1:
-      ansible_host: TODO
+      ansible_host: 52.193.53.37
       use_mysql: true
       use_nginx: true
       use_app: true
     host2:
-      ansible_host: TODO
+      ansible_host: 57.181.157.221
       use_mysql: true
       use_nginx: true
       use_app: true
     host3:
-      ansible_host: TODO
+      ansible_host: 35.76.155.22
       use_mysql: true
       use_nginx: true
       use_app: true
